@@ -26,3 +26,5 @@
 ### Evening
 
 - GitHub Actions for automated test runs
+- REST API with gin
+- use viper to load config from .env

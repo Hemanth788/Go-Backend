@@ -7,19 +7,19 @@ import (
 	"testing"
 
 	_ "github.com/lib/pq"
+	"go.com/go-backend/util"
 )
 
 var testQueries *Queries
 var testDB *sql.DB
 
-const (
-	dbDriver = "postgres"
-	dbSource = "postgresql://admin:admin@localhost:5432/bank?sslmode=disable"
-)
-
 func TestMain(m *testing.M) {
-	var err error
-	testDB, err = sql.Open(dbDriver, dbSource)
+	config, err := util.LoadConfig("../../")
+	if err != nil {
+		log.Fatal("cannot load app config: ", err.Error())
+	}
+
+	testDB, err = sql.Open(config.DBDriver, config.DBSource)
 
 	if err != nil {
 		log.Fatal("cannot connect to the database: ", err.Error())
