@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestTransfer(t *testing.T) {
+func TestTransferTx(t *testing.T) {
 	store := NewStore(testDB)
 
 	_, account1 := createRandomAccount(t)
@@ -22,7 +22,7 @@ func TestTransfer(t *testing.T) {
 	results := make(chan TransferTxResult)
 
 	for i := range numOfTxns {
-		txName := fmt.Sprintf("txn:%d", i + 1)
+		txName := fmt.Sprintf("txn:%d", i+1)
 		go func() {
 			ctx := context.WithValue(context.Background(), TX_KEY, txName)
 			result, err := store.TransferTx(ctx, TransferTxParams{
@@ -112,4 +112,55 @@ func TestTransfer(t *testing.T) {
 	require.Equal(t, account1.Balance-(int64(numOfTxns)*amount), updatedAccount1.Balance)
 	require.Equal(t, account2.Balance+(int64(numOfTxns)*amount), updatedAccount2.Balance)
 
+}
+
+func TestTransferTxDeadlock(t *testing.T) {
+	store := NewStore(testDB)
+
+	_, account1 := createRandomAccount(t)
+	_, account2 := createRandomAccount(t)
+	fmt.Println(">> balances before for account1(from) and account2(to):", account1.Balance, account2.Balance)
+
+	numOfTxns := 10
+	amount := int64(10)
+
+	errs := make(chan error)
+
+	for i := range numOfTxns {
+		txName := fmt.Sprintf("txn:%d", i+1)
+		fromAccountID := account1.ID
+		toAccountID := account2.ID
+
+		if i%2 == 1 {
+			fromAccountID = account2.ID
+			toAccountID = account1.ID
+		}
+
+		go func() {
+			ctx := context.WithValue(context.Background(), TX_KEY, txName)
+			_, err := store.TransferTx(ctx, TransferTxParams{
+				FromAccountID: fromAccountID,
+				ToAccountID:   toAccountID,
+				Amount:        amount,
+			})
+
+			errs <- err
+		}()
+	}
+
+	for range numOfTxns {
+		err := <-errs
+		require.NoError(t, err)
+	}
+
+	updatedAccount1, err := testQueries.GetAccount(context.Background(), account1.ID)
+	require.NoError(t, err)
+
+	updatedAccount2, err := testQueries.GetAccount(context.Background(), account2.ID)
+	require.NoError(t, err)
+
+	fmt.Println(">> balances after for account1(from) and account2(to):", updatedAccount1.Balance, updatedAccount2.Balance)
+
+	require.Equal(t, account1.Balance, updatedAccount1.Balance)
+	require.Equal(t, account2.Balance, updatedAccount2.Balance)
 }
