@@ -22,3 +22,7 @@
 - avoiding deadlock in 2-way money flow concurrent DB transactions
 - test it
 - I in ACID
+
+### Evening
+
+- GitHub Actions for automated test runs
