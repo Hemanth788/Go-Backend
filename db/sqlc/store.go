@@ -6,21 +6,25 @@ import (
 	"fmt"
 )
 
-// Why store? because Queries has CRUD for individual tables in the db but we need a place to do txns across tables and this is it
+type Store interface {
+	Querier
+	TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error)
+}
 
-type Store struct {
+// Why store? because Queries has CRUD for individual tables in the db but we need a place to do txns across tables and this is it
+type SQLStore struct {
 	*Queries
 	db *sql.DB
 }
 
-func NewStore(db *sql.DB) *Store {
-	return &Store{
+func NewStore(db *sql.DB) Store {
+	return &SQLStore{
 		db:      db,
 		Queries: New(db),
 	}
 }
 
-func (store *Store) execTx(ctx context.Context, txFn func(*Queries) error) error {
+func (store *SQLStore) execTx(ctx context.Context, txFn func(*Queries) error) error {
 	dbTxn, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -75,7 +79,7 @@ func updateFromAccount(ctx context.Context, result *TransferTxResult, q *Queries
 	return err
 }
 
-func (store *Store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
+func (store *SQLStore) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
 	var result TransferTxResult
 
 	err := store.execTx(ctx, func(q *Queries) error {
@@ -121,7 +125,7 @@ func (store *Store) TransferTx(ctx context.Context, arg TransferTxParams) (Trans
 		// 	return err
 		// }
 
-		if arg.FromAccountID < arg.ToAccountID { 
+		if arg.FromAccountID < arg.ToAccountID {
 			// result.FromAccount, err = q.UpdateAccount(ctx, UpdateAccountParams{
 			// 	ID: arg.ToAccountID,
 			// 	Balance: account1.Balance - arg.Amount,

@@ -28,3 +28,8 @@
 - GitHub Actions for automated test runs
 - REST API with gin
 - use viper to load config from .env
+
+### Night
+
+- gomock to mock DB
+- table driven testing to increase coverage

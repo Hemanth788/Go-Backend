@@ -4,6 +4,7 @@ go 1.26.1
 
 require (
 	github.com/gin-gonic/gin v1.12.0
+	github.com/golang/mock v1.6.0
 	github.com/lib/pq v1.12.0
 	github.com/spf13/viper v1.21.0
 )
