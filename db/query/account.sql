@@ -29,9 +29,13 @@ WHERE id = $1
 RETURNING *;
 
 -- name: AddAccountBalance :one
-UPDATE accounts 
+UPDATE accounts
 SET balance = balance + sqlc.arg(amount)
 WHERE id = sqlc.arg(id)
+  AND (
+        sqlc.arg(amount) >= 0
+        OR balance >= ABS(sqlc.arg(amount))
+      )
 RETURNING *;
 
 -- name: DeleteAccount :exec
