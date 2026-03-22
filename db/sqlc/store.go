@@ -125,6 +125,7 @@ func (store *SQLStore) TransferTx(ctx context.Context, arg TransferTxParams) (Tr
 		// 	return err
 		// }
 
+		// one way to put the queries that run concurrently in "some" order, not the best, TODO: gotta look into this
 		if arg.FromAccountID < arg.ToAccountID {
 			// result.FromAccount, err = q.UpdateAccount(ctx, UpdateAccountParams{
 			// 	ID: arg.ToAccountID,
