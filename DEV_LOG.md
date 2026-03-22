@@ -41,3 +41,11 @@
 - add users table with foreign keys to existing account table, 1 user can have 1 account per currency
 - generate boilerplate SQL-GO code for utility, mocks for testing
 - better error handling for SQL violations
+
+### Night
+
+- add createUser route and handler
+- add password hashing
+- test hashing
+- test the createUser handler
+- improve createUser test by writing a custom matcher
