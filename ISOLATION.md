@@ -71,5 +71,5 @@
 - `set transaction isolation level serializable;`
   - the example in the corresponding section above would throw an error at this level
 
-![MySQL Isolation levels and anomaly mitigation](image.png)
-![PostgreSQL Isolation levels and anomaly mitigation](image-1.png)
+![MySQL Isolation levels and anomaly mitigation](./assets/image.png)
+![PostgreSQL Isolation levels and anomaly mitigation](./assets/image-1.png)

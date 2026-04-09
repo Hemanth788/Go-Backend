@@ -87,7 +87,7 @@ func TestGetAccountAPI(t *testing.T) {
 			tc.buildStubs(store)
 
 			// create a server with mock store
-			server := NewServer(store)
+			server := newTestServer(t, store)
 			// create a test response recorder: an implementation of [http.ResponseWriter] that records its mutations for later inspection in tests.
 			recorder := httptest.NewRecorder()
 
