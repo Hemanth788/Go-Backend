@@ -49,3 +49,11 @@
 - test hashing
 - test the createUser handler
 - improve createUser test by writing a custom matcher
+
+## 09-04-2026
+
+### Evening
+
+- add loginUser route
+- add JWT, PASETO token makers
+- add tests
