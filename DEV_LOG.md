@@ -57,3 +57,10 @@
 - add loginUser route
 - add JWT, PASETO token makers
 - add tests
+
+## 10-04-2026
+
+### Night
+
+- add authn middleware, authz
+- add and update tests
