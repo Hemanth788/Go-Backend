@@ -1,5 +1,5 @@
 postgres:
-	docker run --name go-be-pg -p 5432:5432 -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin -d postgres:18.3-alpine3.23
+	docker run --name go-be-pg --network go-be-nw -p 5432:5432 -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin -d postgres:18.3-alpine3.23
 
 createdb:
 	docker exec -it go-be-pg createdb --username=admin --owner=admin bank
