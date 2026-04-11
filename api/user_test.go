@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -24,32 +25,27 @@ type eqCreateUserParamsMatcher struct {
 	password string
 }
 
-func (e eqCreateUserParamsMatcher) Matches(matchesArgs any) bool {
-	// cast the type and check for err
-	castedArgs, ok := matchesArgs.(db.CreateUserParams)
+func (e eqCreateUserParamsMatcher) Matches(x any) bool {
+	arg, ok := x.(db.CreateUserParams)
 	if !ok {
 		return false
 	}
 
-	// see if the password is fine and see if any err
-	err := util.CheckPassword(e.password, castedArgs.HashedPassword)
+	err := util.CheckPassword(e.password, arg.HashedPassword)
 	if err != nil {
 		return false
 	}
 
-	// store hashedPassword on the customMatcher
-	e.arg.HashedPassword = castedArgs.HashedPassword
-
-	// check equality
-	return reflect.DeepEqual(e.arg, matchesArgs)
+	e.arg.HashedPassword = arg.HashedPassword
+	return reflect.DeepEqual(e.arg, arg)
 }
 
-// returns our custom matcher with our implementation of Matches
-func EqCreateUserParams(arg db.CreateUserParams, password string) eqCreateUserParamsMatcher {
-	return eqCreateUserParamsMatcher{
-		arg:      arg,
-		password: password,
-	}
+func (e eqCreateUserParamsMatcher) String() string {
+	return fmt.Sprintf("matches arg %v and password %v", e.arg, e.password)
+}
+
+func EqCreateUserParams(arg db.CreateUserParams, password string) gomock.Matcher {
+	return eqCreateUserParamsMatcher{arg, password}
 }
 
 func TestCreateUserAPI(t *testing.T) {
@@ -81,7 +77,7 @@ func TestCreateUserAPI(t *testing.T) {
 					Return(user, nil)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusOK, recorder.Code)
+				require.Equal(t, http.StatusCreated, recorder.Code)
 				requireBodyMatchUser(t, recorder.Body, user)
 			},
 		},
@@ -202,7 +198,7 @@ func TestCreateUserAPI(t *testing.T) {
 }
 
 func randomUser(t *testing.T) (user db.User, password string) {
-	password = util.RandomString(6)
+	password = util.RandomString(8)
 	hashedPassword, err := util.HashPassword(password)
 	require.NoError(t, err)
 
