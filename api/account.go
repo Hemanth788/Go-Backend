@@ -2,15 +2,16 @@ package api
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 	db "go.com/go-backend/db/sqlc"
+	"go.com/go-backend/token"
 )
 
 type createAccountReq struct {
-	Owner    string `json:"owner" binding:"required"`
 	Currency string `json:"currency" binding:"required,currency"`
 }
 
@@ -21,8 +22,10 @@ func (server *Server) createAccount(ctx *gin.Context) {
 		return
 	}
 
+	authPayload := ctx.MustGet(AUTH_PAYLOAD_KEY).(*token.Payload)
+
 	arg := db.CreateAccountParams{
-		Owner:    req.Owner,
+		Owner:    authPayload.Username,
 		Currency: req.Currency,
 		Balance:  0,
 	}
@@ -64,6 +67,14 @@ func (server *Server) getAccount(ctx *gin.Context) {
 		return
 	}
 
+	authPayload := ctx.MustGet(AUTH_PAYLOAD_KEY).(*token.Payload)
+
+	if account.Owner != authPayload.Username {
+		err := errors.New("Account doesn't belong to the logged in user")
+		ctx.JSON(http.StatusUnauthorized, errorResp(err))
+		return
+	}
+
 	ctx.JSON(http.StatusOK, account)
 }
 
@@ -79,7 +90,10 @@ func (server *Server) listAccount(ctx *gin.Context) {
 		return
 	}
 
+	authPayload := ctx.MustGet(AUTH_PAYLOAD_KEY).(*token.Payload)
+
 	arg := db.ListAccountsParams{
+		Owner:  authPayload.Username,
 		Limit:  req.PageSize,
 		Offset: (req.PageID - 1) * req.PageSize,
 	}

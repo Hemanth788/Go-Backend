@@ -8,15 +8,15 @@ import (
 )
 
 type Payload struct {
-	ID uuid.UUID `json:"id"`
-	Username string `json:"username"`
-	IssuedAt time.Time `json:"issued_at"`
+	ID        uuid.UUID `json:"id"`
+	Username  string    `json:"username"`
+	IssuedAt  time.Time `json:"issued_at"`
 	ExpiredAt time.Time `json:"expired_at"`
 }
 
 var (
 	ERROR_EXPIRED_TOKEN = errors.New("Token has expired")
-	ERR_INVALID_TOKEN = errors.New("Token is invalid")
+	ERR_INVALID_TOKEN   = errors.New("Token is invalid")
 )
 
 func NewPayload(username string, duration time.Duration) (*Payload, error) {
@@ -27,9 +27,9 @@ func NewPayload(username string, duration time.Duration) (*Payload, error) {
 	}
 
 	payload := &Payload{
-		ID: tokenID,
-		Username: username,
-		IssuedAt: time.Now(),
+		ID:        tokenID,
+		Username:  username,
+		IssuedAt:  time.Now(),
 		ExpiredAt: time.Now().Add(duration),
 	}
 

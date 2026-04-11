@@ -7,10 +7,10 @@ import (
 )
 
 type Config struct {
-	DBDriver   string `mapstructure:"DB_DRIVER"`
-	DBSource   string `mapstructure:"DB_SOURCE"`
-	ServerAddr string `mapstructure:"SERVER_ADDR"`
-	TokenSymmKey string `mapstructure:"TOKEN_SYMM_KEY"`
+	DBDriver            string        `mapstructure:"DB_DRIVER"`
+	DBSource            string        `mapstructure:"DB_SOURCE"`
+	ServerAddr          string        `mapstructure:"SERVER_ADDR"`
+	TokenSymmKey        string        `mapstructure:"TOKEN_SYMM_KEY"`
 	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
 }
 

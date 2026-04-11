@@ -12,10 +12,10 @@ import (
 )
 
 type Server struct {
-	config util.Config
-	store  db.Store
+	config     util.Config
+	store      db.Store
 	tokenMaker token.Maker
-	router *gin.Engine
+	router     *gin.Engine
 }
 
 func (server *Server) Start(addr string) error {
@@ -29,8 +29,8 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 		return nil, fmt.Errorf("cannot create token maker: %w", err)
 	}
 	server := &Server{
-		config: config,
-		store: store,
+		config:     config,
+		store:      store,
 		tokenMaker: tokenMaker,
 	}
 
@@ -47,10 +47,13 @@ func (server *Server) setupRouter() {
 
 	router.POST("/accounts", server.createAccount)
 	router.GET("/accounts/:id", server.getAccount)
-	router.GET("/accounts", server.listAccount)
-	router.POST("/transfers", server.createTransfer)
-	router.POST("/users", server.createUser)
-	router.POST("/users/login", server.loginUser)
+
+	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
+
+	authRoutes.GET("/accounts", server.listAccount)
+	authRoutes.POST("/transfers", server.createTransfer)
+	authRoutes.POST("/users", server.createUser)
+	authRoutes.POST("/users/login", server.loginUser)
 
 	server.router = router
 }

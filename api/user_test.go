@@ -20,7 +20,7 @@ import (
 )
 
 type eqCreateUserParamsMatcher struct {
-	arg db.CreateUserParams
+	arg      db.CreateUserParams
 	password string
 }
 
@@ -47,7 +47,7 @@ func (e eqCreateUserParamsMatcher) Matches(matchesArgs any) bool {
 // returns our custom matcher with our implementation of Matches
 func EqCreateUserParams(arg db.CreateUserParams, password string) eqCreateUserParamsMatcher {
 	return eqCreateUserParamsMatcher{
-		arg: arg,
+		arg:      arg,
 		password: password,
 	}
 }

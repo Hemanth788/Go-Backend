@@ -1,13 +1,15 @@
 package util
 
-var supportedCurrencies = map[string]struct{}{
-	"USD": {},
-	"CAD": {},
-	"EUR": {},
-	"INR": {},
-}
+const (
+	USD = "USD"
+	EUR = "EUR"
+	CAD = "CAD"
+)
 
 func IsSupportedCurrency(currency string) bool {
-	_, ok := supportedCurrencies[currency]
-	return ok
+	switch currency {
+	case USD, EUR, CAD:
+		return true
+	}
+	return false
 }

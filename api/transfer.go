@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	db "go.com/go-backend/db/sqlc"
+	"go.com/go-backend/token"
 )
 
 type transferReq struct {
@@ -24,11 +25,23 @@ func (server *Server) createTransfer(ctx *gin.Context) {
 		return
 	}
 
-	if !server.validAccount(ctx, req.FromAccountID, req.Currency, true) {
+	fromAccount, valid := server.validAccount(ctx, req.FromAccountID, req.Currency, true)
+
+	if !valid {
 		return
 	}
 
-	if !server.validAccount(ctx, req.ToAccountID, req.Currency, false) {
+	authPayload := ctx.MustGet(AUTH_PAYLOAD_KEY).(*token.Payload)
+
+	if fromAccount.Owner != authPayload.Username {
+		err := errors.New("From account doesn't belong to the logged in user")
+		ctx.JSON(http.StatusUnauthorized, errorResp(err))
+		return
+	}
+
+	_, valid = server.validAccount(ctx, req.ToAccountID, req.Currency, false)
+
+	if !valid {
 		return
 	}
 
@@ -51,15 +64,15 @@ func (server *Server) createTransfer(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, result)
 }
 
-func (server *Server) validAccount(ctx *gin.Context, accountID int64, currency string, isFrom bool) bool {
+func (server *Server) validAccount(ctx *gin.Context, accountID int64, currency string, isFrom bool) (db.Account, bool) {
 	account, err := server.store.GetAccount(ctx, accountID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResp(err))
-			return false
+			return account, false
 		}
 		ctx.JSON(http.StatusInternalServerError, errorResp(err))
-		return false
+		return account, false
 	}
 
 	str := fmt.Sprintf("sender account[%d] of currency: %s cannot send currency of %s", accountID, account.Currency, currency)
@@ -71,8 +84,8 @@ func (server *Server) validAccount(ctx *gin.Context, accountID int64, currency s
 	if account.Currency != currency {
 		err := fmt.Errorf("%s", str)
 		ctx.JSON(http.StatusBadRequest, errorResp(err))
-		return false
+		return account, false
 	}
 
-	return true
+	return account, true
 }
