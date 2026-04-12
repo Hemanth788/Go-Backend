@@ -48,7 +48,8 @@ func TestGetAccountAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "UnauthorizedUser",
+			name:      "UnauthorizedUser",
+			accountID: account.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuth(t, request, tokenMaker, AUTH_TYPE_BEARER, "unauthorized_user", time.Minute)
 			},
