@@ -64,3 +64,16 @@
 
 - add authn middleware, authz
 - add and update tests
+
+## 11-04-2026
+
+### Night
+
+- Dockerfile
+- fix failing tests
+
+## 12-04-2026
+
+### Night
+
+- docker-compose
