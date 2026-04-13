@@ -77,3 +77,10 @@
 ### Night
 
 - docker-compose
+
+## 13-04-2026
+
+### Night
+
+- created a free-tier AWS account
+- added a GHA deploy job
