@@ -84,3 +84,11 @@
 
 - created a free-tier AWS account
 - added a GHA deploy job
+
+## 14-04-2026
+
+### Afternoon
+
+- created a database on RDS
+- store, retrieve secrets with AWS secrets manager
+- get prod env var from above and use them in deploy job
